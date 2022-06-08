@@ -501,6 +501,7 @@ export default function Quiz(){
     if(question == null){
         return(
             <div>
+                <p>AINDA NAO FUNCIONAL</p>
                 Você acertou {correctQuestion}/{questions.length}, média de acerto de {Math.floor(correctQuestion/questions.length*100)}%
             </div>
         )
@@ -512,7 +513,6 @@ export default function Quiz(){
         const rand = [...randomQuestions]
         rand.splice(index, 1)
         setRandomQuestion(rand)
-        console.log(rand.length)
         
     }} />;
 
@@ -523,79 +523,65 @@ function Questao(props){
     const text = props.text;
     const options = props.options;
     const exp = props.exp;
-    //console.log(options)
 
+    const keys = Object.keys(options)
+    const opcoesList = []
+    for(let i in keys){
+        opcoesList.push(options[keys[i]])
+    }
 
     const [disabled, setDisabled] = useState(false);
-    function handleClick(e){
-        setDisabled(true)
-        
-        const value = e.target.getAttribute('data-correct');
-        if(value == 'true'){
-            e.target.parentElement.style.backgroundColor = "green"
-            e.target.parentElement.querySelector('span').style.setProperty('color','white','important')    
-        }else{
-            e.target.parentElement.style.backgroundColor = "red"
-            e.target.parentElement.querySelector('span').style.setProperty('color','white','important')
 
-            const corret = document.getElementsByClassName('option')
-            
-            for(let i = 0; i < corret.length; i++){
-                if(corret[i].getAttribute('data-correct') == 'true'){
-                    corret[i].parentElement.style.backgroundColor = "green"
-                    corret[i].parentElement.querySelector('span').style.setProperty('color','white','important')
+    function handleClick(target,correct){
+        setDisabled(true)
+
+
+        if(correct){
+            target.parentElement.parentElement.style.backgroundColor = "green"
+            target.parentElement.querySelector('span').style.setProperty('color','white','important')    
+        }else{
+            target.parentElement.parentElement.style.backgroundColor = "red"
+            target.parentElement.querySelector('span').style.setProperty('color','white','important')
+
+            for(let i = 0; i < opcoesList.length; i++){
+                if(opcoesList[i].correct){
+                    const correct = document.getElementsByTagName('li')[i]
+                    correct.style.backgroundColor = "green"
+                    correct.querySelector('span').style.setProperty('color','white','important')
                 }
             }
         }
 
     }
 
+    
+
     return(
         <div className="question">
             <div className="question-text">
-            <h5>Questão:</h5>
+                <h3>Questão:</h3>
                 {text}
             </div>
-            <h5>Opções:</h5>
+            <h3>Opções:</h3>
             
             <div className="question-options">
                 <ul>
-                    <li>
-                        <label>
-                            <input type="radio" name="option" className='option' id='answerA' data-correct={options['A']['correct']} onClick={handleClick} disabled={disabled}/>
-                            <span>{options['A']['text']}</span>
-                        </label>
-                    </li>
-                    <li>
-                        <label>
-                            <input type="radio" name="option" className='option' id='answerB' data-correct={options['B']['correct']} onClick={handleClick} disabled={disabled}/>
-                            <span>{options['B']['text']}</span>
-                        </label>
-                        
-                    </li>
-                    <li>
-                        <label>
-                            <input type="radio" name="option" className='option' id='answerC' data-correct={options['C']['correct']} onClick={handleClick} disabled={disabled}/>
-                            <span>{options['C']['text']}</span>
-                        </label>
-                    </li>
-                    <li>
-                        <label>
-                            <input type="radio" name="option" className='option' id='answerD' data-correct={options['D']['correct']} onClick={handleClick} disabled={disabled}/>
-                            <span>{options['D']['text']}</span>
-                        </label>
-                    </li>
-                    <li>
-                        <label>
-                            <input type="radio" name="option" className='option' id='answerE' data-correct={options['E']['correct']} onClick={handleClick} disabled={disabled}/>
-                            <span>{options['E']['text']}</span>
-                        </label>
-                    </li>
+                    {opcoesList.map((option, index)=>{
+                       return(
+                            <li key={index}>
+                                <label>
+                                    <input type='radio' name="option" onClick={((e) => handleClick(e.target, option.correct))} disabled={disabled}/>
+                                    <span>{option.text}</span>
+                                </label>
+                            </li>
+                       )
+                       
+                    })}
                 </ul>
                 
             </div>
             <div className="question-exp">
-                {disabled ? <h5>Explicação:</h5> : null}
+                {disabled ? <h3>Explicação:</h3> : null}
                 {disabled ? exp : null}
             </div>
             <div className="question-submit">
